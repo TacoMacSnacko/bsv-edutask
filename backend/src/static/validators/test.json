@@ -1,0 +1,11 @@
+{
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["username", "isActive"],
+        "properties": {
+            "username": { "bsonType": "string", "uniqueItems": true },
+            "isActive": { "bsonType": "bool"   },
+            "notes":    { "bsonType": "string" }
+        }
+    }
+}
