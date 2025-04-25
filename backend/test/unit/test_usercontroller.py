@@ -37,3 +37,11 @@ def test_get_user_by_email_0_matches():
 
     assert uc.get_user_by_email(email='jane.doe@email.com') == None
 
+
+def test_get_user_by_email_invalid_email():
+    mockedDAO = mock.MagicMock()
+    mockedDAO.find.return_value = []
+    uc = UserController(dao=mockedDAO)
+
+    with pytest.raises(ValueError):
+        uc.get_user_by_email(email='jane.doe')
