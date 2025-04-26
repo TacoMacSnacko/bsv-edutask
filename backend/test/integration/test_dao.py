@@ -8,14 +8,20 @@ from src.util.dao import DAO
 
 @pytest.fixture
 def entry():
-    return { "username": "test name", "isActive": True, "notes"   : "asdasdasd" }
+    return { "username": "test name", "isActive": True, "notes": "asdasdasd" }
 
-
-def test_create_valid_entry(entry):
-
+@pytest.fixture
+def sut():
     dao = DAO(collection_name='test')
-    addedEntry = dao.create(entry)
+    yield dao
+
     dao.collection.drop()
+
+
+
+def test_create_valid_entry(entry, sut):
+    
+    addedEntry = sut.create(entry)
 
     haveOriginalValues = set(entry).issubset(addedEntry)
     haveId = "_id" in addedEntry
@@ -23,45 +29,33 @@ def test_create_valid_entry(entry):
     assert haveOriginalValues and haveId
 
 
-def test_create_missing_required_value(entry):
+def test_create_missing_required_value(entry, sut):
 
     del entry["isActive"]
 
-    dao = DAO(collection_name='test')
-
     with pytest.raises(Exception):
-        addedEntry = dao.create(entry)
-        dao.collection.drop()
+        addedEntry = sut.create(entry)
+    
 
-
-def test_create_wrong_type_bool(entry):
+def test_create_wrong_type_bool(entry, sut):
 
     entry["isActive"] = "True"
 
-    dao = DAO(collection_name='test')
-
     with pytest.raises(pymongo.errors.WriteError):
-        addedEntry = dao.create(entry)
-        dao.collection.drop()
+        addedEntry = sut.create(entry)
 
 
-def test_create_wrong_type_string(entry):
+def test_create_wrong_type_string(entry, sut):
 
     entry["notes"] = True
 
-    dao = DAO(collection_name='test')
-
     with pytest.raises(pymongo.errors.WriteError):
-        addedEntry = dao.create(entry)
-        dao.collection.drop()
+        addedEntry = sut.create(entry)
 
 
-def test_create_duplicate_unique_value(entry):
-
-    dao = DAO(collection_name='test')
-
+def test_create_duplicate_unique_value(entry, sut):
+    
     with pytest.raises(pymongo.errors.WriteError):
-        addedEntry1 = dao.create(entry)
-        addedEntry2 = dao.create(entry)
-        dao.collection.drop()
+        addedEntry1 = sut.create(entry)
+        addedEntry2 = sut.create(entry)
 
