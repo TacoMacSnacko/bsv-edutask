@@ -33,7 +33,7 @@ def test_create_missing_required_value(entry, sut):
 
     del entry["isActive"]
 
-    with pytest.raises(Exception):
+    with pytest.raises(pymongo.errors.WriteError):
         addedEntry = sut.create(entry)
     
 
