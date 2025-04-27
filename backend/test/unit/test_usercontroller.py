@@ -45,3 +45,13 @@ def test_get_user_by_email_invalid_email():
 
     with pytest.raises(ValueError):
         uc.get_user_by_email(email='jane.doe')
+
+def test_get_user_by_email_db_failure():
+    mockedDAO = mock.MagicMock()
+    mockedDAO.find.side_effect = Exception("Database error")
+    uc = UserController(dao=mockedDAO)
+
+    with pytest.raises(Exception) as exc_info:
+        uc.get_user_by_email(email='jane.doe@email.com')
+
+    assert "Database error" in str(exc_info.value)
